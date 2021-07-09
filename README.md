@@ -1,2 +1,2 @@
-# coding_for_everyone_c_cpp
-Course work for Coding for Everyone: C and C++
+# coding-for-everyone-c-cpp
+Course work for Coursera's Coding for Everyone: C and C++

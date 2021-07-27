@@ -1,6 +1,6 @@
 /*
   Monte Carlo Simulation of
-  Poker Hand Probability
+  Poker h Probability
 */
 
 #include <stdio.h>
@@ -55,7 +55,6 @@ void shuffle_deck(card d[])
 	for (i = 0; i < 52; i++)
     {
         r = i + (rand() % (52 - i)); // choses random card from  remaining deck to swap with
-  
         swap(&d[i], &d[r]);
     }
 }
@@ -74,60 +73,146 @@ void print_deck(card d[], int n)
 }
 
 
-void check_pairs(card h[], int *no_p, int *one_p, int *two_p, int *three_p, int *four_p, int *f_house)
+void deal_hands(card d[], card h1[], card h2[], card h3[], card h4[], card h5[], card h6[], card h7[])
 {
-	int i, j, no_pairfull_house = 0;
-	int pairs[6] = {0};
-
-	for (i = 0; i < 7; i++)
+	int i;
+	
+	for (i = 0; i < 7; i ++)
 	{
-		int pip1 = h[i].pip;
+		h1[i] = d[i];
+		h2[i] = d[i + 7];
+		h3[i] = d[i + 14];
+		h4[i] = d[i + 21];
+		h5[i] = d[i + 28];
+		h6[i] = d[i + 35];
+		h7[i] = d[i + 42];
+	}
+}
 
-		for (j = i + 1; j < 7; j++)
+
+int pip_not_already_checked(int pip, int pips[]) // checks to see if pip has already been checked, so we don't double count pairs
+{
+	int i;
+	for (i = 0; i < 6; i++)
+	{
+		if (pip == pips[i])
 		{
-			int pip2 = h[j].pip;
+			return 0;
+		}
+	}
+	return 1;
+}
 
-			if (pip1 == pip2)
+
+void check_hand(card h[], double *np, double *op, double *tp, double *tk, double *fk, double *fh)
+{
+	int pairs[6] = {0};
+	int pips[6] = {-1}; // keep track of pips that we have already checked for pairs.
+	int i, j, pair1 = 0, pair2 = 0;
+
+	for (i = 0; i < 6; i ++)
+	{
+		if (pip_not_already_checked(h[i].pip, pips))
+		{
+			for (j = 6; j > i; j--)
 			{
-				pairs[i] += 1;
+				if (h[i].pip == h[j].pip)
+				{
+					pairs[i] += 1;
+					pips[i] = h[i].pip;
+				}
 			}
 		}
 	}
 
-	for (int k = 0; k < 6; k++)
+	for (i = 0; i < 6; i ++)
 	{
-		printf("%d\t", pairs[k]);
+		if (pairs[i] > 0)
+		{
+			if (pairs[i] > pair1)  // doing it in this order should always result in pair1 >= pair2
+			{
+				pair1 = pairs[i];
+			}
+			else
+			{
+				if (pairs[i] > pair2)
+				{
+					pair2 = pairs[i];
+				}
+			}
+		}
+	}
 
+	if (pair1 == 3)
+	{
+		*fk += 1;
+	}
+	else if (pair1 == 2 && pair2 == 1)
+	{
+		*fh += 1;
+	}
+	else if (pair1 == 2 && pair2 == 0)
+	{
+		*tk += 1;
+	}
+	else if (pair1 == 1 && pair2 == 1)
+	{
+		*tp += 1;
+	}
+	else if (pair1 == 1 && pair2 == 0)
+	{
+		*op += 1;
+	}
+	else
+	{
+		*np += 1;
 	}
 }
 
 
 int main(void)
 {
-	const int NUM_HANDS = 1;
-	int i, j, k;
-	int no_pair = 0, one_pair = 0, two_pair = 0, three_of_a_kind = 0, four_of_a_kind = 0, full_house = 0; // initialize probability counts
-	card deck[52], hand[7];
+	const int NUM_HANDS = 1000006; // multiple of 7
+	int i = 0; // initialize iterator
+	double no_pair = 0, one_pair = 0, two_pair = 0, three_of_a_kind = 0, four_of_a_kind = 0, full_house = 0; // initialize probability counts
+	card deck[52], hand1[7], hand2[7], hand3[7], hand4[7], hand5[7], hand6[7], hand7[7]; // initialize the 7 hands that can be delt from the 52 cards
 
 	populate_deck(deck);
 
-	for (i = 0; i < NUM_HANDS; i++)
+	while (i < NUM_HANDS)
 	{
-		j = i % 7; // after 7 deals, the cards need to be reshuffled
+		shuffle_deck(deck);
+		deal_hands(deck, hand1, hand2, hand3, hand4, hand5, hand6, hand7);
 
-		if (j == 0)
-		{
-			shuffle_deck(deck);
-		}
+		check_hand(hand1, &no_pair, &one_pair, &two_pair, &three_of_a_kind, &four_of_a_kind, &full_house);
+		i++;
 
-		for (k = 0; k < 7; k++) // gets 0-6 first hand, 7-13 second hand, etc.
-		{
-			hand[k] = deck[k + (7 * j)];
-		}
+		check_hand(hand2, &no_pair, &one_pair, &two_pair, &three_of_a_kind, &four_of_a_kind, &full_house);
+		i++;
 
-		print_deck(hand, 7);
-		printf("\n\n");
-		check_pairs(hand, &no_pair, &one_pair, &two_pair, &three_of_a_kind, &four_of_a_kind, &full_house);
-		printf("\n\n");
+		check_hand(hand3, &no_pair, &one_pair, &two_pair, &three_of_a_kind, &four_of_a_kind, &full_house);
+		i++;
+
+		check_hand(hand4, &no_pair, &one_pair, &two_pair, &three_of_a_kind, &four_of_a_kind, &full_house);
+		i++;
+
+		check_hand(hand5, &no_pair, &one_pair, &two_pair, &three_of_a_kind, &four_of_a_kind, &full_house);
+		i++;
+
+		check_hand(hand6, &no_pair, &one_pair, &two_pair, &three_of_a_kind, &four_of_a_kind, &full_house);
+		i++;
+
+		check_hand(hand7, &no_pair, &one_pair, &two_pair, &three_of_a_kind, &four_of_a_kind, &full_house);
+		i++;
 	}
+
+	printf("\n");
+	printf("Probabilty of no pair: %lf\n", (no_pair / i));
+	printf("Probabilty of one pair: %lf\n", (one_pair / i));
+	printf("Probabilty of two pair: %lf\n", (two_pair / i));
+	printf("Probabilty of three of a kind: %lf\n", (three_of_a_kind / i));
+	printf("Probabilty of full house: %lf\n", (full_house / i));
+	printf("Probabilty of four of a kind: %lf\n\n", (four_of_a_kind / i));
+
+	return 0;
 }	

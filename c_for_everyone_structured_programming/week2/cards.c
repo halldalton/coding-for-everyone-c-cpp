@@ -54,7 +54,7 @@ void shuffle_deck(card d[])
 	
 	for (i = 0; i < 52; i++)
     {
-        r = i + (rand() % (52 - i)); // choses random card from  remaining deck to swap with
+        r = i + (rand() % (52 - i)); // choses random card from remaining deck to swap with
         swap(&d[i], &d[r]);
     }
 }

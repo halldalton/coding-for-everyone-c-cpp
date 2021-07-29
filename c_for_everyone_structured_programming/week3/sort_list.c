@@ -1,12 +1,13 @@
 /*
-  Lists
-  Dalton Hall
-  July 28th, 2021
+  Sort List
+  July 29th, 2021
 */
 
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+// List Functionality
 
 typedef struct list
 {
@@ -96,45 +97,72 @@ void delete(list *p)
 
 void print_list(list *h, char *title)
 {
+  int i = 0;
   printf("%s\n", title);
   while (h != NULL)
   {
-    printf("%d : ", h -> data);
+    if (i % 5 == 0)
+    {
+      printf("\n");
+    }
+    printf("%02d : ", h -> data); // keeps formatting even across lines
     h = h -> next;
+    i++;
+  }
+}
+
+// Sort Functionality
+
+void swap(int *a, int *b)
+{
+  int temp = *a;
+  *a = *b;
+  *b = temp;
+}
+
+
+void bubble(list *h, int how_many)
+{
+  int i;
+  list *head = h;
+  for (i = how_many; i > 0; i--)
+  {
+    h = head; // reset pointer to head of list to iterate over the list again
+    while (h -> next != NULL)
+    {
+      if (h -> data > h -> next -> data)
+      {
+        swap(&h -> data, &h -> next -> data);
+      }
+      h = h -> next;
+    }
   }
 }
 
 
 int main()
 {
-  list *list1 = NULL;
-  list *list2 = NULL;
-  int data1[3] = {1, 2, 3};
-  int data2[3] = {4, 6};
-  list1 = array_to_list(data1, 3);
-  list2 = array_to_list(data2, 2);
+  int i;
+  const int SIZE = 100;
+  int data[SIZE];
+  list *l = NULL;
 
-  printf("\nList1 is of length %d\n\n", count(list1));
-  print_list(list1, "List1");
+  for (i = 0; i < SIZE; i++)
+  {
+    data[i] = rand() % 100; // keep random ints < 100 to reduce clutter when printing
+  }
 
-  printf("\n\nList2 is of length %d\n\n", count(list2));
-  print_list(list2, "List2");
+  l = array_to_list(data, SIZE);
 
-  insert(list2, list2->next, create_list(5));
-
-  printf("\n\nList2 after inserting 5\n\n");
-  print_list(list2, "List2");
-
-  concat(list1, list2);
-
-  printf("\n\nList1 after concatenation:\n\n");
-  print_list(list1, "List1");
-
-  delete(list1 -> next -> next);
-
-  printf("\n\nList1 after deleting 4th element:\n\n");
-  print_list(list1, "List1");
-
+  printf("\n");
+  print_list(l, "Unsorted List");
   printf("\n\n");
+
+  bubble(l, SIZE);
+
+  printf("\n");
+  print_list(l, "Sorted List");
+  printf("\n\n");
+
   return 0;
 }

@@ -83,8 +83,8 @@ int main()
 
   printf("\n");
   print_and_write_data(data, size, ofp);
-  printf("\nAverage score is: %.2f, max score is %d\n\n", avg, m); // print to stdout
-  fprintf(ofp, "\nAverage score is: %.2f, max score is %d", avg, m); // write to file
+  printf("\nAverage score is: %.2f, max score is: %d\n\n", avg, m); // print to stdout
+  fprintf(ofp, "\nAverage score is: %.2f, max score is: %d", avg, m); // write to file
 
   fclose(ifp);
   fclose(ofp);

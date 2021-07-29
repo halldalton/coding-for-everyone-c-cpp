@@ -1,0 +1,4 @@
+My homework scores are: 
+93	92	90	78	85	73	99	78	80	81	
+82	70	79	94	96	80	89	90	91	77	
+Average score is: 84.85, max score is 99

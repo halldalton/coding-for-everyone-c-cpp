@@ -151,13 +151,6 @@ void delete(list *p) // deletes the next node
   free(temp);
 }
 
-void delete_last(list *h) // special logic for last node to avoid segfault
-{
-  list *last = h -> next;
-  h -> next = NULL;
-  free(last);
-}
-
 void remove_duplicates(list *h)
 {
   while (h -> next -> next != NULL)
@@ -172,9 +165,11 @@ void remove_duplicates(list *h)
     }
   }
 
-  if (h -> data == h -> next -> data)
+  if (h -> data == h -> next -> data) // special logic to remove last duplicate item without segfault
   {
-    delete_last(h);
+    list *last = h -> next;
+    h -> next = NULL;
+    free(last);
   }
 }
 

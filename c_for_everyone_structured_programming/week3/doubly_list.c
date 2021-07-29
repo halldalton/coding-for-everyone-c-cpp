@@ -22,6 +22,11 @@ int is_empty(const list *l)
   return (l == NULL);
 }
 
+int head(const list *l)
+{
+  return l -> data;
+}
+
 
 list *create_list(int d)
 {
@@ -91,29 +96,6 @@ void insert(list *p1, list *p2, list *q)
 }
 
 
-void delete(list *p) // deletes the next node
-{
-  list *temp;
-  temp = p -> next;
-  p -> next = temp -> next;
-  temp -> next -> prev = p;
-  free(temp);
-}
-
-
-void remove_duplicates(list *h)
-{
-  while (h -> next != NULL)
-  {
-    if (h -> data == h -> next -> data)
-    {
-      delete(h); // deletes h -> next
-    }
-    h = h -> next;
-  }
-}
-
-
 void print_list(list *h, char *title)
 {
   int i = 0;
@@ -158,11 +140,49 @@ void bubble(list *h, int how_many)
   }
 }
 
+// remove functionality
+
+void delete(list *p) // deletes the next node
+{
+  list *temp;
+  temp = p -> next;
+  p -> next = temp -> next;
+  temp -> next -> prev = p;
+  free(temp);
+}
+
+void delete_last(list *h) // special logic for last node to avoid segfault
+{
+  list *last = h -> next;
+  h -> next = NULL;
+  free(last);
+}
+
+void remove_duplicates(list *h)
+{
+  while (h -> next -> next != NULL)
+  {
+    if (h -> data == h -> next -> data)
+    {
+      delete(h); // deletes h -> next
+    }
+    else
+    {
+      h = h -> next;
+    }
+  }
+
+  if (h -> data == h -> next -> data)
+  {
+    delete_last(h);
+  }
+}
+
 
 int main()
 {
   int i;
-  const int SIZE = 10;
+  const int SIZE = 200;
   int data[SIZE];
   list *l = NULL;
 
@@ -170,7 +190,6 @@ int main()
   {
     data[i] = rand() % 50; // keep random ints < 50 
   }
-
   l = array_to_list(data, SIZE);
 
   printf("\n");

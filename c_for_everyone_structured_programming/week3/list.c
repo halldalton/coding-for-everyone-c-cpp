@@ -2,6 +2,7 @@
   Lists
   Dalton Hall
   July 28th, 2021
+  Updated July 30th to improve delete function
 */
 
 #include <assert.h>
@@ -85,12 +86,29 @@ void insert(list *p1, list *p2, list *q)
 }
 
 
-void delete(list *p)
+void delete(list *p, list **prev, list **hd)
+{
+  if (*hd == *prev)
+  {
+    *hd = p -> next;
+  }
+  else
+  {
+    (*prev) -> next = p -> next;
+  }
+  free(p);
+}
+
+
+void delete_list(list *h)
 {
   list *temp;
-  temp = p -> next;
-  p -> next = temp -> next;
-  free(temp);
+  if (h != NULL)
+  {
+    temp = h;
+    delete_list(h = h -> next);
+    free(temp);
+  }
 }
 
 
@@ -130,9 +148,9 @@ int main()
   printf("\n\nList1 after concatenation:\n\n");
   print_list(list1, "List1");
 
-  delete(list1 -> next -> next);
+  delete(list1 -> next -> next, &list1 -> next, &list1);
 
-  printf("\n\nList1 after deleting 4th element:\n\n");
+  printf("\n\nList1 after deleting 3rd element:\n\n");
   print_list(list1, "List1");
 
   printf("\n\n");

@@ -10,7 +10,7 @@
 
 #define N 40
 
-void sum(int* p, int n, int d[])
+void sum(int *p, int n, int d[])
 {
   int i;
   *p = 0;

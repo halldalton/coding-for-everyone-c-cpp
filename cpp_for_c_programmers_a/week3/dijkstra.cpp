@@ -23,7 +23,7 @@ class Graph
 
   public:
 
-    Graph(int size = 50, double density = .4) // default constructor
+    Graph(const int size = 50, const double density = .4) // default constructor
     {
       graph = vector<vector<int>>(size, vector<int>(size, 0)); // initialize matrix of size x size, values set to 0
       n_nodes = size;

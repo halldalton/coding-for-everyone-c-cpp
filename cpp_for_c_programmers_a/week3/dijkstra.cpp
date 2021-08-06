@@ -1,40 +1,44 @@
 // Dijkstra's algorithm in C++
 // August 4th, 2021
 
+#include <list>
 #include <iostream>
 #include <vector>
 
 using namespace std;
 using Node = int; // scheme for naming vertices
 
+
 inline double prob()
 {
   return rand() / static_cast<double>(RAND_MAX); // generates random value between 0 and 1
 }
 
+
+// two dimensional vector to represent the graph as a matrix
+// index [i] represents the node and index [i][j] represents the edge between nodes 1 and j
 class Graph
 {
   private:
 
-    // two dimensional vector to represent the graph as a matrix
     vector<vector<int>> graph; // int values represent the weight of the edge between two nodes
     int n_nodes;
     int n_edges;
 
   public:
 
-    Graph(const int size = 50, const double density = .4) // default constructor
+    Graph(const int size = 50, const double density = .4) // default constructor, generates random graph
     {
-      graph = vector<vector<int>>(size, vector<int>(size, 0)); // initialize matrix of size x size, values set to 0
+      graph = vector<vector<int>>(size, vector<int>(size, 0)); // initialize matrix of (size * size), values set to 0
       n_nodes = size;
       n_edges = 0;
       for (int i = 0; i < size; ++i)
       {
-        for (int j = i; j < size; ++j) // graph is symetrical
+        for (int j = i; j < size; ++j) // graph is symetrical, [i][j] == [j][i]
         {
           if (i == j) 
           {
-            graph[i][j] = 0; // no loops
+            graph[i][j] = 0; // no self referential loops
           }
           else
           {
@@ -73,7 +77,7 @@ class Graph
     vector<Node> neighbors(Node x) // lists all nodes y such that there is an edge from x to y.
     {
       vector<Node> neighbors;
-      for (int j; j < n_nodes; j++)
+      for (int j; j < n_nodes; ++j)
       {
         if (graph[x][j] > 0)
         {
@@ -99,11 +103,6 @@ class Graph
       }
     }
 
-    int get_node_value(Node x)// returns the value associated with the node x.
-    {
-      return x;
-    }
-
     int get_edge_value(Node x, Node y) // returns the value associated to the edge (x,y).
     {
       return graph[x][y];
@@ -113,4 +112,12 @@ class Graph
     {
       graph[x][y] = graph[y][x] = v;
     }
+};
+
+
+// 
+class PriorityQueue
+{
+  public:
+    
 };

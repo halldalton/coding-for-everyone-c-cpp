@@ -1,17 +1,18 @@
 // Dijkstra's algorithm in C++
 // August 4th, 2021
 
-#include <list>
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
 using namespace std;
 using Node = int; // scheme for naming vertices
+using Edge = pair<Node, int>; // ADT for edge in PriorityQueue class
 
 
-inline double prob()
+inline double prob() // generates random value between 0 and 1
 {
-  return rand() / static_cast<double>(RAND_MAX); // generates random value between 0 and 1
+  return rand() / static_cast<double>(RAND_MAX);
 }
 
 
@@ -27,7 +28,7 @@ class Graph
 
   public:
 
-    Graph(const int size = 50, const double density = .4) // default constructor, generates random graph
+    Graph(const int size = 50, const double density = .4, const int range = 10) // default constructor, generates random graph
     {
       graph = vector<vector<int>>(size, vector<int>(size, 0)); // initialize matrix of (size * size), values set to 0
       n_nodes = size;
@@ -44,8 +45,8 @@ class Graph
           {
             if (prob() < density)
             {
-              add(i, j);
-              n_edges++;
+              add(i, j, range);
+              n_edges++; // increment number of edges everytime we add one
             }
           }
         }
@@ -74,24 +75,25 @@ class Graph
       }
     }
 
-    vector<Node> neighbors(Node x) // lists all nodes y such that there is an edge from x to y.
+    vector<Edge> neighbors(Node x) // retuns vector of Edge {node, cost} of neighbors 
     {
-      vector<Node> neighbors;
+      vector<Edge> neighbors;
       for (int j; j < n_nodes; ++j)
       {
         if (graph[x][j] > 0)
         {
-          neighbors.push_back(j); // adds value to vector
+          Edge e = {j, graph[x][j]};
+          neighbors.push_back(e); // adds value to vector
         }
       }
       return neighbors;
     }
 
-    void add(Node x, Node y) // adds to G the edge from x to y, if it is not there.
+    void add(Node x, Node y, int range) // adds to G the edge from x to y, if it is not there.
     {
       if (graph[x][y] == 0)
       {
-        graph[x][y] = graph[y][x] = (rand() % 10) + 1; // random distance between 1 and 10
+        graph[x][y] = graph[y][x] = (rand() % range) + 1; // random distance between 1 and range
       }
     }
 
@@ -115,9 +117,66 @@ class Graph
 };
 
 
-// 
+// priority queue implementation using a sorted vector
 class PriorityQueue
 {
+  private:
+
+    vector<Edge> queue;
+
+    bool comp(const Edge &a, const Edge &b) // used to compare edges, kept private since it is only used internally to sort
+    {
+      return a.second < b.second;
+    }
+
   public:
-    
+
+    PriorityQueue() {} // default constructor
+
+    PriorityQueue(Node i, Graph source) // constructor that takes a node and its source graph as arguments
+    {
+      queue = source.neighbors(i);
+      sort(queue.begin(), queue.end(), comp); // sort the queue to get a minHeap
+    }
+
+    PriorityQueue(vector<Edge> neighbors) // constructor that takes a vector of edges as an argument
+    {
+      queue = neighbors;
+      sort(queue.begin(), queue.end(), comp); // sort the queue to get a minHeap
+    }
+
+    void minPrioirty() // removes the top element of the queue.
+    {
+      queue.erase(queue.begin());
+    }
+
+    bool contains(Edge queue_element) // does the queue contain queue_element.
+    {
+      Node first = queue_element.first;
+      int second = queue_element.second;
+      for (int i; i < queue.size(); ++i)
+      {
+        if (first == queue[i].first && second == queue[i].second)
+        {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    void insert(Edge queue_element) // insert queue_element into queue
+    {
+      queue.push_back(queue_element);
+      sort(queue.begin(), queue.end(), comp); // sort the queue to get a minHeap
+    }
+
+    Edge top() // returns the top element of the queue.
+    {
+      return queue[0];
+    }
+
+    int size() // return the number of queue_elements.
+    {
+      return queue.size();
+    }
 };

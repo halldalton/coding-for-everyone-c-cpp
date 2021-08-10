@@ -114,6 +114,11 @@ class Graph
     {
       graph[x][y] = graph[y][x] = v;
     }
+
+    ~Graph() 
+    {
+      vector<vector<int>>().swap(graph); // deallocates memory by swapping graph with an unitialized vector
+    }
 };
 
 
@@ -153,10 +158,9 @@ class PriorityQueue
     bool contains(Edge queue_element) // does the queue contain queue_element.
     {
       Node first = queue_element.first;
-      int second = queue_element.second;
       for (int i; i < queue.size(); ++i)
       {
-        if (first == queue[i].first && second == queue[i].second)
+        if (first == queue[i].first)
         {
           return true;
         }
@@ -166,7 +170,24 @@ class PriorityQueue
 
     void insert(Edge queue_element) // insert queue_element into queue
     {
-      queue.push_back(queue_element);
+      if (contains(queue_element))
+      {
+        Node first = queue_element.first;
+        int second = queue_element.second;
+        for (int i; i < queue.size(); ++i)
+        {
+          Node compare_first = queue[i].first;
+          if (first == compare_first)
+          {
+            int compare_second = queue[i].second;
+            queue[i].second = min(second, compare_second); // find min cost and add back to minHeap
+          }
+        }
+      }
+      else
+      {
+        queue.push_back(queue_element);
+      }
       sort(queue.begin(), queue.end(), comp); // sort the queue to get a minHeap
     }
 
@@ -179,4 +200,103 @@ class PriorityQueue
     {
       return queue.size();
     }
+
+    vector<Edge> get_queue() // returns the queue
+    {
+      return queue;
+    }
+
+    ~PriorityQueue() 
+    {
+      vector<Edge>().swap(queue); // deallocates memory by swapping queue with an unitialized vector
+    }
+};
+
+
+//
+class ShortestPath
+{
+  private:
+
+    Graph graph;
+
+  public:
+
+    ShortestPath() // default constructor
+    {
+      graph = Graph();
+    }
+
+    ShortestPath(const int size = 50, const double density = .4, const int range = 10) // constructor that takes size, density, and range as arguments
+    {
+      graph = Graph(size, density, range);
+    }
+
+    ShortestPath(Graph graph): graph(graph) {} // constructor that takes an existing graph as an argument
+
+
+    vector<Node> vertices() // list of vertices in G(V,E).
+    {
+      vector<Node> nodes;
+      for (int i = 0; i < graph.V(); ++i)
+      {
+        nodes[i] = i;
+      }
+      return nodes;
+    }
+
+    vector<Node> path(Node u, Node w) // find shortest path between u-w and returns the sequence of vertices representing shorest path u-v1-v2-…-vn-w.
+    {
+      // step 1
+      // inlcude s in closed set
+      vector<Edge> init; // init vector to feed into priority queue class
+      Edge start = {u, 0};
+      init.push_back(start);
+      PriorityQueue closed_set = PriorityQueue(init);
+
+      // add all immediate successors of s to open set
+      vector<Edge> neighbors = graph.neighbors(u);
+      PriorityQueue open_set = PriorityQueue(neighbors);
+
+      // step 2
+      // pick open node with least cost
+      Edge next = open_set.top();
+      Node current = next.first;
+      int cost = next.second;
+      
+      // remove from open set and add to closed set
+      closed_set.insert(next);
+      open_set.minPrioirty();
+
+      while (current != w)  // repeat previous steps until current == w
+      {
+        neighbors = graph.neighbors(current);
+        for (int i = 0; i < neighbors.size(); ++i)
+        {
+          neighbors[i].second += cost;
+          open_set.insert(neighbors[i]);
+        }
+        next = open_set.top();
+        current = next.first;
+        cost = next.second;
+
+        closed_set.insert(next);
+        open_set.minPrioirty();
+      }
+    }
+    
+    int path_size(Node u, Node w) // return the path cost associated with the shortest path.
+    {
+      vector<Node> solution = path(u, w);
+      int size = 0;
+      for (int i = 0; i < solution.size() - 1; ++i)
+      {
+        Node a = solution[i];
+        Node b = solution[i + 1];
+        size += graph.get_edge_value(a, b); // sum the cost with each associated edge between a and b
+      }
+      return size;
+    }
+
+    ~ShortestPath() {}
 };

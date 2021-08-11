@@ -22,12 +22,15 @@ class Graph
 {
   private:
 
+    // variables
     vector<vector<int>> graph; // int values represent the weight of the edge between two nodes
     int n_nodes;
     int n_edges;
 
+
   public:
 
+    // constructors
     Graph(const int size = 50, const double density = .4, const int range = 10) // default constructor, generates random graph
     {
       graph = vector<vector<int>>(size, vector<int>(size, 0)); // initialize matrix of (size * size), values set to 0
@@ -53,15 +56,18 @@ class Graph
       }
     }
 
+    // methods
     int V() // returns the number of vertices in the graph
     {
       return n_nodes;
     } 
 
+
     int E() // returns the number of edges in the graph
     {
       return n_edges;
     } 
+
 
     bool adjacent(Node x, Node y) // tests whether there is an edge from node x to node y.
     {
@@ -74,6 +80,7 @@ class Graph
         return false;
       }
     }
+
 
     vector<Edge> neighbors(Node x) // retuns vector of Edge {node, cost} of neighbors 
     {
@@ -89,6 +96,7 @@ class Graph
       return neighbors;
     }
 
+
     void add(Node x, Node y, int range) // adds to G the edge from x to y, if it is not there.
     {
       if (graph[x][y] == 0)
@@ -96,6 +104,7 @@ class Graph
         graph[x][y] = graph[y][x] = (rand() % range) + 1; // random distance between 1 and range
       }
     }
+
 
     void remove(Node x, Node y) // removes the edge from x to y, if it is there.
     {
@@ -105,16 +114,19 @@ class Graph
       }
     }
 
+
     int get_edge_value(Node x, Node y) // returns the value associated to the edge (x,y).
     {
       return graph[x][y];
     }
+
 
     void set_edge_value(Node x, Node y, int v) // sets the value associated to the edge (x,y) to v.
     {
       graph[x][y] = graph[y][x] = v;
     }
 
+    // deconstructor
     ~Graph() 
     {
       vector<vector<int>>().swap(graph); // deallocates memory by swapping graph with an unitialized vector
@@ -127,8 +139,10 @@ class PriorityQueue
 {
   private:
 
+    // variables
     vector<Edge> queue;
 
+    // methods
     bool comp(const Edge &a, const Edge &b) // used to compare edges, kept private since it is only used internally to sort
     {
       return a.second < b.second;
@@ -136,7 +150,9 @@ class PriorityQueue
 
   public:
 
+    // constructrors
     PriorityQueue() {} // default constructor
+
 
     PriorityQueue(Node i, Graph source) // constructor that takes a node and its source graph as arguments
     {
@@ -144,16 +160,19 @@ class PriorityQueue
       sort(queue.begin(), queue.end(), comp); // sort the queue to get a minHeap
     }
 
+
     PriorityQueue(vector<Edge> neighbors) // constructor that takes a vector of edges as an argument
     {
       queue = neighbors;
       sort(queue.begin(), queue.end(), comp); // sort the queue to get a minHeap
     }
 
+    // methods
     void minPrioirty() // removes the top element of the queue.
     {
       queue.erase(queue.begin());
     }
+
 
     bool contains(Edge queue_element) // does the queue contain queue_element.
     {
@@ -167,6 +186,7 @@ class PriorityQueue
       }
       return false;
     }
+
 
     void insert(Edge queue_element) // insert queue_element into queue
     {
@@ -191,21 +211,25 @@ class PriorityQueue
       sort(queue.begin(), queue.end(), comp); // sort the queue to get a minHeap
     }
 
+
     Edge top() // returns the top element of the queue.
     {
       return queue[0];
     }
+
 
     int size() // return the number of queue_elements.
     {
       return queue.size();
     }
 
+
     vector<Edge> get_queue() // returns the queue
     {
       return queue;
     }
 
+    // deconstructor
     ~PriorityQueue() 
     {
       vector<Edge>().swap(queue); // deallocates memory by swapping queue with an unitialized vector
@@ -218,23 +242,27 @@ class ShortestPath
 {
   private:
 
+    // variables
     Graph graph;
 
   public:
 
+    // constructors
     ShortestPath() // default constructor
     {
       graph = Graph();
     }
+
 
     ShortestPath(const int size = 50, const double density = .4, const int range = 10) // constructor that takes size, density, and range as arguments
     {
       graph = Graph(size, density, range);
     }
 
+
     ShortestPath(Graph graph): graph(graph) {} // constructor that takes an existing graph as an argument
 
-
+    // methods
     vector<Node> vertices() // list of vertices in G(V,E).
     {
       vector<Node> nodes;
@@ -244,6 +272,7 @@ class ShortestPath
       }
       return nodes;
     }
+
 
     vector<Node> path(Node u, Node w) // find shortest path between u-w and returns the sequence of vertices representing shorest path u-v1-v2-…-vn-w.
     {
@@ -276,6 +305,7 @@ class ShortestPath
           neighbors[i].second += cost;
           open_set.insert(neighbors[i]);
         }
+
         next = open_set.top();
         current = next.first;
         cost = next.second;
@@ -285,6 +315,7 @@ class ShortestPath
       }
     }
     
+
     int path_size(Node u, Node w) // return the path cost associated with the shortest path.
     {
       vector<Node> solution = path(u, w);
@@ -298,5 +329,6 @@ class ShortestPath
       return size;
     }
 
+    // deconstructor
     ~ShortestPath() {}
 };
